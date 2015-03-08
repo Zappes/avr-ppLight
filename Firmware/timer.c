@@ -24,8 +24,8 @@ void timer_init() {
 	// enable output for the strip
 	DDR |= _BV(PIN_STRIP);
 
-	// output PWM on OC0B/PB1, Fast PWM
-	TCCR0A |= _BV(COM0B1) | _BV(WGM00) | _BV(WGM01);
+	// output PWM on OC0B/PB1, Fast PWM, inverting mode
+	TCCR0A |= _BV(COM0B0) | _BV(COM0B1) | _BV(WGM00) | _BV(WGM01);
 
 	// prescaler set to 256, giving a frequency of 32khz for the counter and a pwm freq of 122hz
 	TCCR0B |= _BV(CS02);
@@ -41,6 +41,7 @@ void timer_start() {
 	cli();
 	delay = TIMER_DELAY;
 	direction = DIR_UP;
+
 	sei();
 }
 
@@ -61,19 +62,9 @@ ISR(TIMER0_OVF_vect) {
 
 	if (direction == DIR_UP && brightness < 0xFF) {
 		brightness++;
-
-		if (brightness == 1) {
-			// enable output for the strip
-			DDR |= _BV(PIN_STRIP);
-		}
 	} else if (direction == DIR_DOWN && brightness > 0x00) {
 		brightness--;
-
-		if (brightness == 0) {
-			// disable output for the strip
-			DDR &= ~_BV(PIN_STRIP);
-		}
 	}
 
-	OCR0B = brightness;
+	OCR0B = 0xFF - brightness;
 }

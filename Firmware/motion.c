@@ -21,7 +21,7 @@ void motion_init() {
 ISR(PCINT0_vect) {
 	// only trigger on high level!
 	if(PIN & _BV(PIN_MOVE)) {
-		if(adc_read_byte(ADC_TRIM) >= adc_read_byte(ADC_LIGHT)) {
+		if(adc_read_byte(ADC_TRIM) <= adc_read_byte(ADC_LIGHT)) {
 			timer_start();
 		}
 	}
